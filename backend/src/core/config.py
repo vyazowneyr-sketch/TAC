@@ -1,10 +1,11 @@
-from pydantic import BaseSettings, PostgresDsn
+from pydantic_settings import BaseSettings
+from pydantic import PostgresDsn
 from typing import List
 
 class Settings(BaseSettings):
     #for MAIN
-    APP_NAME="TAC"
-    APP_VERSION="0.1.1"
+    APP_NAME: str = "TAC"
+    APP_VERSION: str ="0.1.1"
     DEBUG: bool = True
 
     #DATABASE
