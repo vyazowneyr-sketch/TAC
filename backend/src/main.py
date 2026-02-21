@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from src.core.config import settings
 from src.api.auth import router as auth_router
+from src.api.activities import router as activities_router
 
 app = FastAPI(
     title=settings.APP_NAME,
@@ -26,6 +27,8 @@ app.include_router(
     prefix = settings.API_PREFIX,
     tags = ["Authentication"]
 )
+
+app.include_router(activities_router, prefix="/api/v1", tags=["Activities"])
 
 @app.get("/check")
 async def check():
