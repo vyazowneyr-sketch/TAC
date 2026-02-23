@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter
+from fastapi import Depends, APIRouter, HTTPException
 from sqlalchemy.orm import Session
 from src.models.activity import Activity
 from src.models.database import get_db
@@ -20,3 +20,12 @@ def create_activity(activity: ActivityCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(new_activity)
     return new_activity
+
+@router.put("/activities/{activity_id}")
+def update_time(activity_id: int, time_add: int, db: Session = Depends(get_db)):
+    activity = db.query(Activity).filter(Activity.id == activity_id).first()
+    if not activity:
+        raise HTTPException(status_code = 404, detail="Активность не найдена")
+    activity.total_time = (activity.total_time or 0) + time_add
+    db.commit()
+    return activity
