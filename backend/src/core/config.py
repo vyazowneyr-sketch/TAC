@@ -26,5 +26,14 @@ class Settings(BaseSettings):
     class Config:
         env_file = ".env"
         case_sensitive = True #управление чуствительностью валидации
+    
+    #Mail settings
+    MAIL_USERNAME = str
+    MAIL_PASSWORD = str
+    MAIL_SERVER: str = "smtp.mail.ru"
+    MAIL_PORT: int = 465
+    
+    class Config:
+        env_file = ".env"
 
 settings = Settings()
