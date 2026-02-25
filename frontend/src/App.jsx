@@ -1,14 +1,31 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login'
 import Tree from './pages/Tree'
+import Register from './pages/Register'
+
+function ProtectedRoute({ children }) {
+  const token = localStorage.getItem('token')
+  if (!token) {
+    return <Navigate to="/login" />
+  }
+  return children
+}
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/tree" element={<Tree />} />
+        <Route path="/register" element={<Register />} />
+        <Route 
+          path="/tree" 
+          element={
+            <ProtectedRoute>
+              <Tree />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="/" element={<Navigate to="/tree" />} />
       </Routes>
     </BrowserRouter>
   )

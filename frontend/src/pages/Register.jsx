@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 
 // Tree Logo SVG
 function TreeLogo() {
@@ -20,29 +21,30 @@ function TreeLogo() {
   )
 }
 
-export default function Login() {
+export default function Register() {
   const [email, setEmail] = useState('')
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const navigate = useNavigate()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError('')
 
     try {
-      const response = await fetch('http://localhost:8000/api/v1/login', {
+      const response = await fetch('http://localhost:8000/api/v1/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, username, password })
       })
 
       if (!response.ok) {
-        throw new Error('Неверный email или пароль')
+        const data = await response.json()
+        throw new Error(data.detail || 'Ошибка регистрации')
       }
 
-      const data = await response.json()
-      localStorage.setItem('token', data.access_token)
-      window.location.href = '/tree'
+      navigate('/login')
     } catch (err) {
       setError(err.message)
     }
@@ -53,8 +55,8 @@ export default function Login() {
       <div className="card auth-card">
         <div className="logo-container">
           <TreeLogo />
-          <h1>TAC</h1>
-          <p style={{ color: 'var(--color-text-light)' }}>Tree Activity Tracker</p>
+          <h1>Регистрация</h1>
+          <p style={{ color: 'var(--color-text-light)' }}>Создай свой аккаунт</p>
         </div>
         
         <form onSubmit={handleSubmit}>
@@ -71,6 +73,18 @@ export default function Login() {
           </div>
           
           <div className="form-group">
+            <label htmlFor="username">Имя пользователя</label>
+            <input 
+              id="username"
+              type="text" 
+              placeholder="username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div className="form-group">
             <label htmlFor="password">Пароль</label>
             <input 
               id="password"
@@ -82,13 +96,13 @@ export default function Login() {
             />
           </div>
           
-          <button type="submit">Войти</button>
+          <button type="submit">Зарегистрироваться</button>
           
           {error && <p className="error">{error}</p>}
         </form>
         
         <p className="links">
-          Нет аккаунта? <a href="/register">Зарегистрироваться</a>
+          Уже есть аккаунт? <a href="/login">Войти</a>
         </p>
       </div>
     </div>
