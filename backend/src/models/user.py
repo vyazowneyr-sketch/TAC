@@ -12,7 +12,7 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
+    verification_token = Column(String, nullable=True)
 
     def verify_password(self, password: str):
         return pwd_context.verify(password, self.hashed_password)
-        

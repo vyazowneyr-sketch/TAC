@@ -5,7 +5,7 @@ from typing import List
 class Settings(BaseSettings):
     #for MAIN
     APP_NAME: str = "TAC"
-    APP_VERSION: str ="0.1.1"
+    APP_VERSION: str = "0.1.1"
     DEBUG: bool = True
 
     #DATABASE
@@ -23,17 +23,14 @@ class Settings(BaseSettings):
     #API
     API_PREFIX: str = "/api/v1"
 
-    class Config:
-        env_file = ".env"
-        case_sensitive = True #управление чуствительностью валидации
-    
     #Mail settings
-    MAIL_USERNAME = str
-    MAIL_PASSWORD = str
+    MAIL_USERNAME: str = ""
+    MAIL_PASSWORD: str = ""
     MAIL_SERVER: str = "smtp.mail.ru"
-    MAIL_PORT: int = 465
+    MAIL_PORT: int = 587
     
     class Config:
         env_file = ".env"
+        case_sensitive = True
 
 settings = Settings()
