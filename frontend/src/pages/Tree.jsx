@@ -191,8 +191,15 @@ export default function Tree() {
   const [activeTimer, setActiveTimer] = useState(false)
   const [seconds, setSeconds] = useState(0)
 
+  const getAuthHeader = () => {
+    const token = localStorage.getItem('token')
+    return token ? { 'Authorization': `Bearer ${token}` } : {}
+  }
+
   useEffect(() => {
-    fetch('http://localhost:8000/api/v1/activities')
+    fetch('http://localhost:8000/api/v1/activities', {
+      headers: getAuthHeader()
+    })
       .then(res => res.json())
       .then(data => setActivities(data))
   }, [])
@@ -202,7 +209,10 @@ export default function Tree() {
     
     const response = await fetch('http://localhost:8000/api/v1/activities', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 
+        'Content-Type': 'application/json',
+        ...getAuthHeader()
+      },
       body: JSON.stringify({ name: newActivity })
     })
     const activity = await response.json()
@@ -227,10 +237,13 @@ export default function Tree() {
       saveInterval = setInterval(async () => {
         if (selectedActivity) {
           await fetch(`http://localhost:8000/api/v1/activities/${selectedActivity}?time_add=5`, {
-            method: 'PUT'
+            method: 'PUT',
+            headers: getAuthHeader()
           })
           // Refresh activities to show updated time
-          const res = await fetch('http://localhost:8000/api/v1/activities')
+          const res = await fetch('http://localhost:8000/api/v1/activities', {
+            headers: getAuthHeader()
+          })
           const data = await res.json()
           setActivities(data)
         }
@@ -248,11 +261,14 @@ export default function Tree() {
     const remainingSeconds = seconds % 5
     if (selectedActivity && remainingSeconds > 0) {
       await fetch(`http://localhost:8000/api/v1/activities/${selectedActivity}?time_add=${remainingSeconds}`, {
-        method: 'PUT'
+        method: 'PUT',
+        headers: getAuthHeader()
       })
     }
     // Refresh activities
-    const res = await fetch('http://localhost:8000/api/v1/activities')
+    const res = await fetch('http://localhost:8000/api/v1/activities', {
+      headers: getAuthHeader()
+    })
     const data = await res.json()
     setActivities(data)
     
