@@ -8,12 +8,12 @@ logger = logging.getLogger(__name__)
 conf = ConnectionConfig(
     MAIL_USERNAME=settings.MAIL_USERNAME,
     MAIL_PASSWORD=settings.MAIL_PASSWORD,
-    MAIL_FROM=settings.MAIL_USERNAME,
+    MAIL_FROM="vyazowneyr@gmail.com",
     MAIL_SERVER=settings.MAIL_SERVER,
     MAIL_PORT=settings.MAIL_PORT,
     MAIL_FROM_NAME="TAC",
-    MAIL_STARTTLS=False,
-    MAIL_SSL_TLS=True
+    MAIL_STARTTLS=True,
+    MAIL_SSL_TLS=False
 )
 
 mail = FastMail(conf)
