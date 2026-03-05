@@ -1,11 +1,13 @@
 import secrets
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
+from pydantic import BaseModel
 from src.schemas import UserResponse, UserCreate, LoginRequest, Token
 from src.models.database import get_db
 from sqlalchemy.orm import Session
 from src.models.user import User
 from src.services.auth import get_password_hash, verify_password, create_access_token
 from src.services.email import send_verification_email_background
+from src.services.google_auth import verify_google_token
 
 router = APIRouter()
 
@@ -60,3 +62,23 @@ def verify_token(token: str, db: Session = Depends(get_db)):
     user.verification_token = None
     db.commit()
     return {"message": "Email подтверждён!"}
+
+@router.post("/auth/google")
+async def google_login(request: dict, db: Session = Depends(get_db)):
+    token = request.get("token")
+    google_user = await verify_google_token(token)
+    email = google_user["email"]
+
+    user = db.query(User).filter(User.email == email).first()
+    if not user:
+        user = User(
+            email = email,
+            username = email.split("@")[0],
+            hashed_password = "google_auth",
+            verification_token = None
+        )
+        db.add(user)
+        db.commit()
+
+    jwt_token = create_access_token(data = {"sub": email})
+    return {"access_token": jwt_token, "token_type": "bearer"}

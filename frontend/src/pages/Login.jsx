@@ -1,4 +1,7 @@
 import { useState } from 'react'
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
+
+const GOOGLE_CLIENT_ID = "476158461658-cf99taf1bmcg4u7knrj63s0hs3qauq77.apps.googleusercontent.com"
 
 // Tree Logo SVG
 function TreeLogo() {
@@ -20,10 +23,30 @@ function TreeLogo() {
   )
 }
 
-export default function Login() {
+function LoginForm() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+
+  const handleGoogleLogin = useGoogleLogin({
+    onSuccess: async (response) => {
+      try {
+        const res = await fetch('http://localhost:8000/api/v1/auth/google', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ token: response.credential })
+        })
+        const data = await res.json()
+        localStorage.setItem('token', data.access_token)
+        window.location.href = '/tree'
+      } catch (err) {
+        setError('Ошибка входа через Google')
+      }
+    },
+    onError: () => {
+      setError('Ошибка входа через Google')
+    }
+  })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -90,7 +113,40 @@ export default function Login() {
         <p className="links">
           Нет аккаунта? <a href="/register">Зарегистрироваться</a>
         </p>
+        
+        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <button 
+            onClick={handleGoogleLogin}
+            style={{ 
+              background: '#fff', 
+              color: '#333',
+              border: '1px solid #ddd',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}
+          >
+            <img 
+              src="https://www.google.com/favicon.ico" 
+              alt="Google" 
+              width="20" 
+              height="20" 
+            />
+            Войти через Google
+          </button>
+        </div>
       </div>
     </div>
+  )
+}
+
+export default function Login() {
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <LoginForm />
+    </GoogleOAuthProvider>
   )
 }

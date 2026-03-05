@@ -8,6 +8,7 @@ from fastapi import HTTPException, status, Depends
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from src.models.database import get_db
 from sqlalchemy.orm import Session
+from src.services.google_auth import verify_google_token
 
 security = HTTPBearer()
 
@@ -40,3 +41,4 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(securit
     if user is None:
         raise HTTPException(status_code = 401, detail="Пользователь не найден")
     return user
+

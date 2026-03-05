@@ -29,8 +29,12 @@ class Settings(BaseSettings):
     MAIL_SERVER: str = "smtp.mail.ru"
     MAIL_PORT: int = 587
     
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+
     class Config:
         env_file = ".env"
         case_sensitive = True
+
 
 settings = Settings()
