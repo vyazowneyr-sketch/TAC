@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { GoogleOAuthProvider, useGoogleLogin } from '@react-oauth/google'
+
+const GOOGLE_CLIENT_ID = "476158461658-cf99taf1bmcg4u7knrj63s0hs3qauq77.apps.googleusercontent.com"
 
 // Tree Logo SVG
 function TreeLogo() {
@@ -21,12 +24,38 @@ function TreeLogo() {
   )
 }
 
-export default function Register() {
+function RegisterForm() {
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const navigate = useNavigate()
+
+  const handleGoogleRegister = useGoogleLogin({
+    onSuccess: async (response) => {
+      console.log('Google response:', response)
+      const tokenToSend = response.access_token
+      console.log('Sending to backend:', tokenToSend)
+      try {
+        const res = await fetch('http://localhost:8000/api/v1/auth/google', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ token: tokenToSend })
+        })
+        console.log('Backend response status:', res.status)
+        const data = await res.json()
+        console.log('Backend response data:', data)
+        localStorage.setItem('token', data.access_token)
+        window.location.href = '/tree'
+      } catch (err) {
+        console.error('Fetch error:', err)
+        setError('Ошибка регистрации через Google')
+      }
+    },
+    onError: () => {
+      setError('Ошибка регистрации через Google')
+    }
+  })
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -101,10 +130,43 @@ export default function Register() {
           {error && <p className="error">{error}</p>}
         </form>
         
+        <div style={{ marginTop: '20px', textAlign: 'center' }}>
+          <button 
+            onClick={handleGoogleRegister}
+            style={{ 
+              background: '#fff', 
+              color: '#333',
+              border: '1px solid #ddd',
+              padding: '10px 20px',
+              borderRadius: '5px',
+              cursor: 'pointer',
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}
+          >
+            <img 
+              src="https://www.google.com/favicon.ico" 
+              alt="Google" 
+              width="20" 
+              height="20" 
+            />
+            Зарегистрироваться через Google
+          </button>
+        </div>
+        
         <p className="links">
           Уже есть аккаунт? <a href="/login">Войти</a>
         </p>
       </div>
     </div>
+  )
+}
+
+export default function Register() {
+  return (
+    <GoogleOAuthProvider clientId={GOOGLE_CLIENT_ID}>
+      <RegisterForm />
+    </GoogleOAuthProvider>
   )
 }

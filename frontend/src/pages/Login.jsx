@@ -30,16 +30,22 @@ function LoginForm() {
 
   const handleGoogleLogin = useGoogleLogin({
     onSuccess: async (response) => {
+      console.log('Google response:', response)
+      const tokenToSend = response.access_token
+      console.log('Sending to backend:', tokenToSend)
       try {
         const res = await fetch('http://localhost:8000/api/v1/auth/google', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ token: response.credential })
+          body: JSON.stringify({ token: tokenToSend })
         })
+        console.log('Backend response status:', res.status)
         const data = await res.json()
+        console.log('Backend response data:', data)
         localStorage.setItem('token', data.access_token)
         window.location.href = '/tree'
       } catch (err) {
+        console.error('Fetch error:', err)
         setError('Ошибка входа через Google')
       }
     },

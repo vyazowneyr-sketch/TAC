@@ -34,6 +34,7 @@ app.include_router(activities_router, prefix="/api/v1", tags=["Activities"])
 async def check():
     return {"status":"OK", "version": settings.APP_VERSION}
 
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(
