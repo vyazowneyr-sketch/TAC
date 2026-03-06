@@ -1,6 +1,5 @@
 import secrets
 from fastapi import APIRouter, Depends, HTTPException, BackgroundTasks
-from pydantic import BaseModel
 from src.schemas import UserResponse, UserCreate, LoginRequest, Token
 from src.models.database import get_db
 from sqlalchemy.orm import Session
